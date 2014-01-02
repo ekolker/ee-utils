@@ -5,8 +5,8 @@ from types import NoneType
 def main(name, *args):
 
   if args == ():
-    args = ['ACML-0603-121-TCT-ND']
-  print args
+    args = ['ACML-0603-121-TCT-ND', '2N7002DWA-7DICT-ND', 'dsig', '1276-1443-1-ND']
+  print args, '\n'
 
   base_url = 'http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name='
 
@@ -27,25 +27,27 @@ def main(name, *args):
     if type(soup.find(itemprop="manufacturer")) == NoneType:
       # skip invalid part numbers
       invalids.append(args[argument_number])
-      continue
 
-    Manufacturer = soup.find(itemprop="manufacturer").find(itemprop="name").contents[0]
-    DigiKeyPN = soup.find(id="reportpartnumber").contents[1]
-    ManufacturerPN = soup.find(class_="seohtag", itemprop='model').contents[0]
-    Description = soup.find(itemprop="description").contents[0]
-    Datasheets = []
-    for link in soup.find_all(class_="lnkDatasheet"):
-      # there could be more than one...
-      Datasheets.append(link.get('href'))
+    else:
+      Manufacturer = soup.find(itemprop="manufacturer").find(itemprop="name").contents[0]
+      DigiKeyPN = soup.find(id="reportpartnumber").contents[1]
+      ManufacturerPN = soup.find(class_="seohtag", itemprop='model').contents[0]
+      Description = soup.find(itemprop="description").contents[0]
+      Datasheets = []
+      for link in soup.find_all(class_="lnkDatasheet"):
+        # there could be more than one...
+        Datasheets.append(link.get('href'))
 
-    print [Manufacturer, ManufacturerPN, DigiKeyPN, Description, Datasheets], '\n'
+
+      
+
+      print [Manufacturer, ManufacturerPN, DigiKeyPN, Description, Datasheets], '\n'
 
   if (len(invalids) > 0):
-    print "Invalid part numbers:"
+    print "\nInvalid part numbers:"
     for i in invalids:
       print i
-
-  # print details
+  print '\n\n'
 
 
 
