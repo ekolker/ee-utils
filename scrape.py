@@ -6,28 +6,18 @@ import requests, sys
 def main(name):
   r = requests.get('http://www.digikey.com/product-detail/en/2N7002-7-F/2N7002-FDITR-ND/717681')
   # "http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=LM2596S-3.3/NOPB-ND")
-
   # "http://www.digikey.com/product-detail/en/PRTR5V0U4Y,125/568-6542-1-ND/2531829")
   # http://www.digikey.com/product-detail/en/CBMF1608T470K/587-1722-1-ND/1008047
   # http://www.digikey.com/product-detail/en/2N7002-7-F/2N7002-FDITR-ND/717681
    
   page_source = r.text.encode("utf8")
-   
-  # soup = BeautifulSoup(page_source)
 
-  # # l = soup.body
-  # k = soup
-  # # print k
-  # print len(k)
-
+  # cut to the chase
   target = '<table class="product-details-table" '
-  start_index = page_source.find(target)#+len(target)
+  start_index = page_source.find(target)
   ingredients = page_source[start_index : len(page_source) - 26]
 
   soup = BeautifulSoup(ingredients)
-
-  # print ingredients
-  # print soup
 
   Manufacturer = soup.find(itemprop="manufacturer").find(itemprop="name").contents[0]
   DigiKeyPN = soup.find(id="reportpartnumber").contents[1]
@@ -36,9 +26,9 @@ def main(name):
 
   print [Manufacturer, ManufacturerPN, DigiKeyPN, Description], '\n'
 
-  details = soup.find(class_='attributes-table-main')
+  # details = soup.find(class_='attributes-table-main')
 
-  print soup.find(class_='product-additional-info')
+  print soup.find_all(class_="lnkDatasheet")
 
   # print details
 
