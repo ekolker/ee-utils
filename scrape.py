@@ -1,22 +1,34 @@
-from bs4 import BeautifulSoup
 import requests, sys
+from bs4 import BeautifulSoup
 from types import NoneType
+
+def output(BOM, invalids):
+  for part in BOM.keys():
+    print part, '\n', BOM[part], '\n'
+
+  if (len(invalids) > 0):
+    print "\nInvalid part numbers:"
+    for i in invalids:
+      print i
+  print '\n\n'
+
 
 def main(name, *args):
 
   if args == ():
-    args = ['ACML-0603-121-TCT-ND', '2N7002DWA-7DICT-ND', 'dsig', '1276-1443-1-ND']
+    args = ['587-1722-1-ND']#'311-1.0KJRCT-ND']#, '2N7002DWA-7DICT-ND', 'dsig', '1276-1443-1-ND']
   print args, '\n'
 
   base_url = 'http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name='
 
-  invalids = []
+  # where we keep good parts and wrong numbers
   BOM = dict()
+  invalids = []
 
   for argument_number in range(len(args)):
-    debug = 'Fetching\t' + str(argument_number) + '\tof\t' + str(len(args)) + '\tparts...'
+    debug = 'Fetching\t' + str(argument_number + 1) + '\tof\t' + str(len(args)) + '\tparts...'
+
     r = requests.get(base_url + args[argument_number])
-     
     page_source = r.text.encode("utf8")
 
     # cut to the chase
@@ -29,9 +41,10 @@ def main(name, *args):
     if type(soup.find(itemprop="manufacturer")) == NoneType:
       # skip invalid part numbers
       invalids.append(args[argument_number])
-      debug = debug + '\tINVALID PN: ' + args[argument_number]
+      print debug + '\tINVALID PN: ' + args[argument_number]
 
     else:
+      print debug
       Manufacturer = soup.find(itemprop="manufacturer").find(itemprop="name").contents[0]
       DigiKeyPN = soup.find(id="reportpartnumber").contents[1]
       ManufacturerPN = soup.find(class_="seohtag", itemprop='model').contents[0]
@@ -41,22 +54,23 @@ def main(name, *args):
         # there could be more than one...
         Datasheets.append(link.get('href'))
 
+
+      # price_chart = soup.find_all('tr')[3]
+      k = soup.find('table', class_='product-additional-info').contents[0].contents[0].find('table')
+      print k, '\n\n'
+
+  
+
+
+
       # add 'em!
       BOM.setdefault(DigiKeyPN, [Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets])
 
-    print debug
+    
 
+  # output(BOM, invalids)
 
-      # print [Manufacturer, ManufacturerPN, DigiKeyPN, Description, Datasheets], '\n'
-
-  for part in BOM.keys():
-    print part, '\n', BOM[part], '\n'
-
-  if (len(invalids) > 0):
-    print "\nInvalid part numbers:"
-    for i in invalids:
-      print i
-  print '\n\n'
+  
 
 
 
