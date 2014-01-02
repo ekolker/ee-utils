@@ -11,8 +11,10 @@ def main(name, *args):
   base_url = 'http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name='
 
   invalids = []
+  BOM = dict()
 
   for argument_number in range(len(args)):
+    debug = 'Fetching\t' + str(argument_number) + '\tof\t' + str(len(args)) + '\tparts...'
     r = requests.get(base_url + args[argument_number])
      
     page_source = r.text.encode("utf8")
@@ -27,6 +29,7 @@ def main(name, *args):
     if type(soup.find(itemprop="manufacturer")) == NoneType:
       # skip invalid part numbers
       invalids.append(args[argument_number])
+      debug = debug + '\tINVALID PN: ' + args[argument_number]
 
     else:
       Manufacturer = soup.find(itemprop="manufacturer").find(itemprop="name").contents[0]
@@ -38,10 +41,16 @@ def main(name, *args):
         # there could be more than one...
         Datasheets.append(link.get('href'))
 
+      # add 'em!
+      BOM.setdefault(DigiKeyPN, [Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets])
 
-      
+    print debug
 
-      print [Manufacturer, ManufacturerPN, DigiKeyPN, Description, Datasheets], '\n'
+
+      # print [Manufacturer, ManufacturerPN, DigiKeyPN, Description, Datasheets], '\n'
+
+  for part in BOM.keys():
+    print part, '\n', BOM[part], '\n'
 
   if (len(invalids) > 0):
     print "\nInvalid part numbers:"
