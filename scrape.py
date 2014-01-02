@@ -49,31 +49,22 @@ def main(name, *args):
       DigiKeyPN = soup.find(id="reportpartnumber").contents[1]
       ManufacturerPN = soup.find(class_="seohtag", itemprop='model').contents[0]
       Description = soup.find(itemprop="description").contents[0]
+
       Datasheets = []
       for link in soup.find_all(class_="lnkDatasheet"):
         # there could be more than one...
         Datasheets.append(link.get('href'))
 
-
-      # price_chart = soup.find_all('tr')[3]
-      # k = soup.find('table', class_='product-additional-info').contents[0].contents[0].find('table')
-      # print k, '\n\n'
-
-      chart = soup.find('table', id='pricing').find_all('td')
       Prices = dict()
-      last = 0
-
+      chart = soup.find('table', id='pricing').find_all('td')
       for index in range(len(chart)):
         if (index % 3 == 0):
-          last = int(chart[index].contents[0].encode('ascii','ignore').replace(',', ''))
-          Prices.setdefault(last, '')
-        if (index % 3 == 1):
-          Prices[last] = float(chart[index].contents[0].encode('ascii','ignore'))
-
-      # print Prices
-
-  
-
+          key = int(chart[index].contents[0].encode('ascii','ignore').replace(',', ''))
+          val = float(chart[index + 1].contents[0].encode('ascii','ignore'))
+          Prices.setdefault(key, val)
+      
+      # go for packages...
+      
 
 
       # add 'em!
