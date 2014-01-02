@@ -56,8 +56,21 @@ def main(name, *args):
 
 
       # price_chart = soup.find_all('tr')[3]
-      k = soup.find('table', class_='product-additional-info').contents[0].contents[0].find('table')
-      print k, '\n\n'
+      # k = soup.find('table', class_='product-additional-info').contents[0].contents[0].find('table')
+      # print k, '\n\n'
+
+      chart = soup.find('table', id='pricing').find_all('td')
+      Prices = dict()
+      last = 0
+
+      for index in range(len(chart)):
+        if (index % 3 == 0):
+          last = int(chart[index].contents[0].encode('ascii','ignore').replace(',', ''))
+          Prices.setdefault(last, '')
+        if (index % 3 == 1):
+          Prices[last] = float(chart[index].contents[0].encode('ascii','ignore'))
+
+      # print Prices
 
   
 
