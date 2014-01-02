@@ -4,7 +4,8 @@ import requests, sys
 # url = raw_input("Enter a website to extract the URL's from: "
 
 def main(name):
-  r = requests.get('http://www.digikey.com/product-detail/en/2N7002-7-F/2N7002-FDITR-ND/717681')
+  r = requests.get('http://www.digikey.com/product-detail/en/CBMF1608T470K/587-1722-1-ND/1008047')
+  # http://www.digikey.com/product-detail/en/2N7002-7-F/2N7002-FDITR-ND/717681')
   # "http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=LM2596S-3.3/NOPB-ND")
   # "http://www.digikey.com/product-detail/en/PRTR5V0U4Y,125/568-6542-1-ND/2531829")
   # http://www.digikey.com/product-detail/en/CBMF1608T470K/587-1722-1-ND/1008047
@@ -24,11 +25,14 @@ def main(name):
   ManufacturerPN = soup.find(class_="seohtag", itemprop='model').contents[0]
   Description = soup.find(itemprop="description").contents[0]
 
-  print [Manufacturer, ManufacturerPN, DigiKeyPN, Description], '\n'
-
   # details = soup.find(class_='attributes-table-main')
 
-  print soup.find_all(class_="lnkDatasheet")
+  Datasheets = []
+  for link in soup.find_all(class_="lnkDatasheet"):
+    Datasheets.append(link.get('href'))
+
+  print [Manufacturer, ManufacturerPN, DigiKeyPN, Description, Datasheets], '\n'
+
 
   # print details
 
