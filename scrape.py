@@ -4,7 +4,7 @@ from types import NoneType
 
 def output(BOM, invalids):
   for part in BOM.keys():
-    print part, '\n', BOM[part], '\n'
+    print part, '\n', BOM[part][0], '\n'
 
   if (len(invalids) > 0):
     print "\nInvalid part numbers:"
@@ -15,6 +15,8 @@ def output(BOM, invalids):
 
 def old_school_search(source, targets):
   start = source.find(targets[0])
+  if start == -1:
+    return ""
   end = source.find(targets[1], start)
   entry = source[start + len(targets[0]):end]
   # we apparently don't actually like unicode
@@ -24,50 +26,51 @@ def old_school_search(source, targets):
 def main(name, *args):
 
   if args == ():
-    args = ["311-1.0KJRCT-ND", "SC1489-1-ND", "WM6699CT-ND", "WM5587CT-ND", "S9337-ND", "S5446-ND", "609-3322-ND"]
+    args = [ "", \
+    # ["311-1.0KJRCT-ND", "SC1489-1-ND", "WM6699CT-ND", "WM5587CT-ND", "S9337-ND", "S5446-ND", "609-3322-ND"]
     # ["", \
-    #  "ACML-0603-121-TCT-ND", \
-    #  "2N7002DWA-7DICT-ND", \
-    #  "296-21527-1-ND", \
-    #  "LM2596S-3.3/NOPB-ND", \
-    #  "296-29936-1-ND", \
-    #  "1276-2154-1-ND", \
-    #  "1276-1443-1-ND", \
-    #  "1276-1116-1-ND", \
-    #  "1276-2267-1-ND", \
-    #  "1276-1173-1-ND", \
-    #  "1276-2908-1-ND", \
-    #  "SC1489-1-ND", \
-    #  "609-3322-ND", \
-    #  "311-1.0KJRCT-ND", \
-    #  "490-5258-1-ND", \
-    #  "587-3105-1-ND", \
-    #  "MMBD914-FDICT-ND", \
-    #  "296-9541-1-ND", \
-    #  "1276-6378-1-ND", \
-    #  "1276-1443-1-ND", \
-    #  "PCE3951CT-ND", \
-    #  "1276-1173-1-ND", \
-    #  "PCE4440CT-ND", \
-    #  "1276-2972-1-ND", \
-    #  "1276-2908-1-ND", \
-    #  "1276-2267-1-ND", \
-    #  "1276-2154-1-ND", \
-    #  "1276-1116-1-ND", \
-    #  "B340A-FDICT-ND", \
-    #  "568-6542-1-ND", \
-    #  "475-1409-1-ND", \
-    #  "475-2558-1-ND", \
-    #  "62T0379", \
-    #  "WM5587CT-ND", \
-    #  "SC1489-1-ND", \
-    #  "609-3322-ND", \
-    #  "S5446-ND", \
-    #  "WM6699CT-ND", \
-    #  "S9337-ND", \
-    #  "SRR6038-100YCT-ND", \
-    #  "ACML-0603-121-TCT-ND", \
-    #  ""]
+     "ACML-0603-121-TCT-ND", \
+     "2N7002DWA-7DICT-ND", \
+     "296-21527-1-ND", \
+     "LM2596S-3.3/NOPB-ND", \
+     "296-29936-1-ND", \
+     "1276-2154-1-ND", \
+     "1276-1443-1-ND", \
+     "1276-1116-1-ND", \
+     "1276-2267-1-ND", \
+     "1276-1173-1-ND", \
+     "1276-2908-1-ND", \
+     "SC1489-1-ND", \
+     "609-3322-ND", \
+     "311-1.0KJRCT-ND", \
+     "490-5258-1-ND", \
+     "587-3105-1-ND", \
+     "MMBD914-FDICT-ND", \
+     "296-9541-1-ND", \
+     "1276-6378-1-ND", \
+     "1276-1443-1-ND", \
+     "PCE3951CT-ND", \
+     "1276-1173-1-ND", \
+     "PCE4440CT-ND", \
+     "1276-2972-1-ND", \
+     "1276-2908-1-ND", \
+     "1276-2267-1-ND", \
+     "1276-2154-1-ND", \
+     "1276-1116-1-ND", \
+     "B340A-FDICT-ND", \
+     "568-6542-1-ND", \
+     "475-1409-1-ND", \
+     "475-2558-1-ND", \
+     "62T0379", \
+     "WM5587CT-ND", \
+     "SC1489-1-ND", \
+     "609-3322-ND", \
+     "S5446-ND", \
+     "WM6699CT-ND", \
+     "S9337-ND", \
+     "SRR6038-100YCT-ND", \
+     "ACML-0603-121-TCT-ND", \
+     ""]
      #['587-1722-1-ND']#'311-1.0KJRCT-ND']#, '2N7002DWA-7DICT-ND', 'dsig', '1276-1443-1-ND']
   print args, '\n'
 
@@ -93,7 +96,7 @@ def main(name, *args):
     if type(soup.find(itemprop="manufacturer")) == NoneType:
       # skip invalid part numbers
       invalids.append(args[argument_number])
-      print debug + '\tINVALID PN: ' + args[argument_number]
+      print debug + '\tINVALID PN: ' + str([args[argument_number]])
 
     else:
       print debug
@@ -128,8 +131,8 @@ def main(name, *args):
         Value = old_school_search(page_source, [search_term, "</td></tr>"])
 
       # go for packages...
-      search_term = "<tr><th align=right valign=top>Package / Case</th><td>"
-      Package = old_school_search(page_source, [search_term, "<"])
+      search_term = ">Package / Case</th><td>"
+      Package = old_school_search(page_source, [search_term, "</td>"])
 
       # add 'em!
       BOM.setdefault(DigiKeyPN, [Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets, Prices, Value, Package])
