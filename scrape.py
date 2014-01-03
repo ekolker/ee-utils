@@ -45,15 +45,15 @@ def main(name, *args):
 
     else:
       print debug
-      Manufacturer = soup.find(itemprop="manufacturer").find(itemprop="name").contents[0]
-      DigiKeyPN = soup.find(id="reportpartnumber").contents[1]
-      ManufacturerPN = soup.find(class_="seohtag", itemprop='model').contents[0]
-      Description = soup.find(itemprop="description").contents[0]
+      Manufacturer = soup.find(itemprop="manufacturer").find(itemprop="name").contents[0].encode('ascii','ignore')
+      DigiKeyPN = soup.find(id="reportpartnumber").contents[1].encode('ascii','ignore')
+      ManufacturerPN = soup.find(class_="seohtag", itemprop='model').contents[0].encode('ascii','ignore')
+      Description = soup.find(itemprop="description").contents[0].encode('ascii','ignore')
 
       Datasheets = []
       for link in soup.find_all(class_="lnkDatasheet"):
         # there could be more than one...
-        Datasheets.append(link.get('href'))
+        Datasheets.append(link.get('href').encode('ascii','ignore'))
 
       Prices = dict()
       chart = soup.find('table', id='pricing').find_all('td')
@@ -63,12 +63,32 @@ def main(name, *args):
           val = float(chart[index + 1].contents[0].encode('ascii','ignore'))
           Prices.setdefault(key, val)
       
+      # Value
+      # do we have a passive?
+      if (Description[0:3] in "RES CAP IND"):
+        # 0 = R, 1 = C, 2 = L
+        type_of_passive = "RESCAPIND".find(Description[0:3]) / 3
+        # what we look for
+        search_terms = {0 : "<tr><th align=right valign=top>Resistance</th><td>", \
+          1 : "<tr><th align=right valign=top>Capacitance</th><td>", \
+          2 : "<tr><th align=right valign=top>Inductance</th><td>"}
+        search_term = search_terms.get(type_of_passive)
+        print Description, type_of_passive, search_term
+        start = page_source.find(search_term)
+        end = page_source.find("</td></tr>", start)
+        entry = page_source[start + len(search_term):end]
+        # we apparently don't actually like unicode
+        entry = entry.replace('\xc2\xb5', 'u')
+        print entry
+
       # go for packages...
-      
+      temp = soup.find('table', class_='product-additional-info').contents[0].find_all('tr')
+      print temp
+
 
 
       # add 'em!
-      BOM.setdefault(DigiKeyPN, [Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets])
+      BOM.setdefault(DigiKeyPN, [Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets, Prices])
 
     
 
