@@ -9,14 +9,66 @@ def output(BOM, invalids):
   if (len(invalids) > 0):
     print "\nInvalid part numbers:"
     for i in invalids:
-      print i
+      print [i]
   print '\n\n'
+
+
+def old_school_search(source, targets):
+  start = source.find(targets[0])
+  end = source.find(targets[1], start)
+  entry = source[start + len(targets[0]):end]
+  # we apparently don't actually like unicode
+  return str(entry.replace('\xc2\xb5', 'u'))
 
 
 def main(name, *args):
 
   if args == ():
-    args = ['587-1722-1-ND']#'311-1.0KJRCT-ND']#, '2N7002DWA-7DICT-ND', 'dsig', '1276-1443-1-ND']
+    args = ["311-1.0KJRCT-ND", "SC1489-1-ND", "WM6699CT-ND", "WM5587CT-ND", "S9337-ND", "S5446-ND", "609-3322-ND"]
+    # ["", \
+    #  "ACML-0603-121-TCT-ND", \
+    #  "2N7002DWA-7DICT-ND", \
+    #  "296-21527-1-ND", \
+    #  "LM2596S-3.3/NOPB-ND", \
+    #  "296-29936-1-ND", \
+    #  "1276-2154-1-ND", \
+    #  "1276-1443-1-ND", \
+    #  "1276-1116-1-ND", \
+    #  "1276-2267-1-ND", \
+    #  "1276-1173-1-ND", \
+    #  "1276-2908-1-ND", \
+    #  "SC1489-1-ND", \
+    #  "609-3322-ND", \
+    #  "311-1.0KJRCT-ND", \
+    #  "490-5258-1-ND", \
+    #  "587-3105-1-ND", \
+    #  "MMBD914-FDICT-ND", \
+    #  "296-9541-1-ND", \
+    #  "1276-6378-1-ND", \
+    #  "1276-1443-1-ND", \
+    #  "PCE3951CT-ND", \
+    #  "1276-1173-1-ND", \
+    #  "PCE4440CT-ND", \
+    #  "1276-2972-1-ND", \
+    #  "1276-2908-1-ND", \
+    #  "1276-2267-1-ND", \
+    #  "1276-2154-1-ND", \
+    #  "1276-1116-1-ND", \
+    #  "B340A-FDICT-ND", \
+    #  "568-6542-1-ND", \
+    #  "475-1409-1-ND", \
+    #  "475-2558-1-ND", \
+    #  "62T0379", \
+    #  "WM5587CT-ND", \
+    #  "SC1489-1-ND", \
+    #  "609-3322-ND", \
+    #  "S5446-ND", \
+    #  "WM6699CT-ND", \
+    #  "S9337-ND", \
+    #  "SRR6038-100YCT-ND", \
+    #  "ACML-0603-121-TCT-ND", \
+    #  ""]
+     #['587-1722-1-ND']#'311-1.0KJRCT-ND']#, '2N7002DWA-7DICT-ND', 'dsig', '1276-1443-1-ND']
   print args, '\n'
 
   base_url = 'http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name='
@@ -63,7 +115,7 @@ def main(name, *args):
           val = float(chart[index + 1].contents[0].encode('ascii','ignore'))
           Prices.setdefault(key, val)
       
-      # Value
+      Value = ""
       # do we have a passive?
       if (Description[0:3] in "RES CAP IND"):
         # 0 = R, 1 = C, 2 = L
@@ -73,104 +125,16 @@ def main(name, *args):
           1 : "<tr><th align=right valign=top>Capacitance</th><td>", \
           2 : "<tr><th align=right valign=top>Inductance</th><td>"}
         search_term = search_terms.get(type_of_passive)
-        print Description, type_of_passive, search_term
-        start = page_source.find(search_term)
-        end = page_source.find("</td></tr>", start)
-        entry = page_source[start + len(search_term):end]
-        # we apparently don't actually like unicode
-        entry = entry.replace('\xc2\xb5', 'u')
-        print entry
+        Value = old_school_search(page_source, [search_term, "</td></tr>"])
 
       # go for packages...
-      temp = soup.find('table', class_='product-additional-info').contents[0].find_all('tr')
-      print temp
-
-
+      search_term = "<tr><th align=right valign=top>Package / Case</th><td>"
+      Package = old_school_search(page_source, [search_term, "<"])
 
       # add 'em!
-      BOM.setdefault(DigiKeyPN, [Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets, Prices])
+      BOM.setdefault(DigiKeyPN, [Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets, Prices, Value, Package])
 
-    
-
-  # output(BOM, invalids)
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  # start = 0
-  # key_words = ['Digi-Key Part Number', 'Manufacturer', 'Manufacturer Part Number', 'Description', 'Package']#, 'Datasheet']
-  # start_words = ['content="sku:', 'itemprop="name">', 'itemprop="model">', 'itemprop="description">', '<tr><th align=right valign=top>Supplier Device Package</th><td>']#, '<a class="lnkDatasheet" href="']
-  # end_words = ['" />', '</span>', '</h1></td></tr>', '</td></tr>', '</td></tr>']#, '" target="_blank"']
-  # data = []
-
-  # for i in range(len(key_words)):
-  #   start = 0
-  #   while (page_source.find(key_words[i], start) > 0):
-  #     data.append('')
-  #     start = page_source.find(key_words[i], start)
-  #     start = page_source.find(start_words[i], start)
-  #     end = page_source.find(end_words[i], start)
-  #     data[i] = data[i] + (page_source[start+len(start_words[i]):end] + ' ')
-
-  # # any_left = 1
-  # # datasheets = ''
-  # # while (page_source.find(search_term) > 0):
-  # #   search_term = '<a class="lnkDatasheet" href="'
-  # #   start = page_source.find(search_term)
-  # #   end = page_source.find('</td></tr>', start)
-
-  # # do we have a passive?
-  # if (data[3][0:3] in "RES CAP IND"):
-  #   # value
-  #   # 0 = R, 1 = C, 2 = L
-  #   type_of_passive = "RESCAPIND".find(data[3][0:3]) / 3
-  #   # what we look for
-  #   search_terms = {0 :'<tr><th align=right valign=top>Resistance</th><td>', \
-  #     1 : '<tr><th align=right valign=top>Capacitance</th><td>', \
-  #     2 : '<tr><th align=right valign=top>Inductance</th><td>'}
-  #   search_term = search_terms.get(type_of_passive)
-  #   start = page_source.find(search_term)
-  #   end = page_source.find('</td></tr>', start)
-  #   entry = page_source[start + len(search_term):end]
-  #   # we apparently don't like unicode
-  #   entry = entry.replace('\xc2\xb5', 'u')
-
-  #   key_words.append('Value')
-  #   data.append(entry)
-
-
-
-
-  #   # print value
-  #   # start = page_source.find(key_words[i])
-  #   # start = page_source.find(start_words[i], start)
-  #   # end = page_source.find(end_words[i], start)
-  #   # data.append(page_source[start+len(start_words[i]):end])
-
-  # # print data
-  # print page_source
-
+  output(BOM, invalids)
 
 
 if __name__ == '__main__':
