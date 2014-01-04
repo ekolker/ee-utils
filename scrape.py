@@ -1,11 +1,24 @@
-import requests, sys
+import requests, sys, csv
 from bs4 import BeautifulSoup
 from types import NoneType
 
-def output(BOM, invalids):
+
+def export_BOM(BOM, filename = 'BOM'):
+  out = open(filename + '.csv', "w")
+  for part_number in BOM.keys():
+    part = BOM[part_number][0]
+    for attribute in part:
+      out.write(attribute + ', ')
+    out.write("\n")
+
+  # out.write(json.dumps(course, ensure_ascii = False, indent = 4) + "\n")
+  out.close()
+  print '\nBOM exported to:\t./' + filename + '.csv\n\n'
+
+
+def print_output(BOM, invalids):
   for part in BOM.keys():
     print part, '\n', BOM[part][0], '\n'
-
   if (len(invalids) > 0):
     print "\nInvalid part numbers:"
     for i in invalids:
@@ -83,7 +96,8 @@ def main(name, *args):
   for argument_number in range(len(args)):
     debug = 'Fetching\t' + str(argument_number + 1) + '\tof\t' + str(len(args)) + '\tparts...'
 
-    r = requests.get(base_url + args[argument_number])
+    Source_Link = base_url + args[argument_number]
+    r = requests.get(Source_Link)
     page_source = r.text.encode("utf8")
 
     # cut to the chase
@@ -104,11 +118,13 @@ def main(name, *args):
       DigiKeyPN = soup.find(id="reportpartnumber").contents[1].encode('ascii','ignore')
       ManufacturerPN = soup.find(class_="seohtag", itemprop='model').contents[0].encode('ascii','ignore')
       Description = soup.find(itemprop="description").contents[0].encode('ascii','ignore')
+      Type = Description.split()[0]
 
-      Datasheets = []
+      Datasheets = ""
       for link in soup.find_all(class_="lnkDatasheet"):
         # there could be more than one...
-        Datasheets.append(link.get('href').encode('ascii','ignore'))
+        Datasheets = Datasheets + link.get('href').encode('ascii','ignore') + " "
+      Datasheets = Datasheets.strip()
 
       Prices = dict()
       chart = soup.find('table', id='pricing').find_all('td')
@@ -130,14 +146,16 @@ def main(name, *args):
         search_term = search_terms.get(type_of_passive)
         Value = old_school_search(page_source, [search_term, "</td></tr>"])
 
-      # go for packages...
       search_term = ">Package / Case</th><td>"
       Package = old_school_search(page_source, [search_term, "</td>"])
 
       # add 'em!
-      BOM.setdefault(DigiKeyPN, [Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets, Prices, Value, Package])
+      BOM.setdefault(DigiKeyPN, [[Type, Value, Description, Package, Manufacturer, ManufacturerPN, Datasheets, Source_Link, DigiKeyPN], Prices])
+      #Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets, Prices, Value, Package, Source_Link])
 
-  output(BOM, invalids)
+  print_output(BOM, invalids)
+
+  export_BOM(BOM)
 
 
 if __name__ == '__main__':
