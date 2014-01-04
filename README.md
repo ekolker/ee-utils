@@ -3,9 +3,11 @@ diptrace-utils
 
 A series of scripts for EEs:
 
-#scraper.py
+##scrape.py
 
-Turn a list of DigiKey part numbers into a complete BOM:
+Turn a list of DigiKey part numbers into a complete BOM. Pulls latest info (including pricing chart) from the part's page on DigiKey.
+
+BOM includes:
 
 * Type
 * Value
@@ -16,5 +18,3 @@ Turn a list of DigiKey part numbers into a complete BOM:
 * Datasheets
 * Source Link
 * DigiKey PN
-
-Also creates a price chart, but this is currently not used or exported
