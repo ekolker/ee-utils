@@ -10,8 +10,6 @@ def export_BOM(BOM, filename = 'BOM'):
     for attribute in part:
       out.write(attribute + ', ')
     out.write("\n")
-
-  # out.write(json.dumps(course, ensure_ascii = False, indent = 4) + "\n")
   out.close()
   print '\nBOM exported to:\t./' + filename + '.csv\n\n'
 
@@ -37,55 +35,9 @@ def old_school_search(source, targets):
 
 
 def main(name, *args):
-
   if args == ():
-    args = [ "", \
-    # ["311-1.0KJRCT-ND", "SC1489-1-ND", "WM6699CT-ND", "WM5587CT-ND", "S9337-ND", "S5446-ND", "609-3322-ND"]
-    # ["", \
-     "ACML-0603-121-TCT-ND", \
-     "2N7002DWA-7DICT-ND", \
-     "296-21527-1-ND", \
-     "LM2596S-3.3/NOPB-ND", \
-     "296-29936-1-ND", \
-     "1276-2154-1-ND", \
-     "1276-1443-1-ND", \
-     "1276-1116-1-ND", \
-     "1276-2267-1-ND", \
-     "1276-1173-1-ND", \
-     "1276-2908-1-ND", \
-     "SC1489-1-ND", \
-     "609-3322-ND", \
-     "311-1.0KJRCT-ND", \
-     "490-5258-1-ND", \
-     "587-3105-1-ND", \
-     "MMBD914-FDICT-ND", \
-     "296-9541-1-ND", \
-     "1276-6378-1-ND", \
-     "1276-1443-1-ND", \
-     "PCE3951CT-ND", \
-     "1276-1173-1-ND", \
-     "PCE4440CT-ND", \
-     "1276-2972-1-ND", \
-     "1276-2908-1-ND", \
-     "1276-2267-1-ND", \
-     "1276-2154-1-ND", \
-     "1276-1116-1-ND", \
-     "B340A-FDICT-ND", \
-     "568-6542-1-ND", \
-     "475-1409-1-ND", \
-     "475-2558-1-ND", \
-     "62T0379", \
-     "WM5587CT-ND", \
-     "SC1489-1-ND", \
-     "609-3322-ND", \
-     "S5446-ND", \
-     "WM6699CT-ND", \
-     "S9337-ND", \
-     "SRR6038-100YCT-ND", \
-     "ACML-0603-121-TCT-ND", \
-     ""]
-     #['587-1722-1-ND']#'311-1.0KJRCT-ND']#, '2N7002DWA-7DICT-ND', 'dsig', '1276-1443-1-ND']
-  print args, '\n'
+    args = ['587-1722-1-ND', '311-1.0KJRCT-ND', '2N7002DWA-7DICT-ND', 'dsig', '1276-1443-1-ND']
+  # print args, '\n'
 
   base_url = 'http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name='
 
@@ -151,9 +103,8 @@ def main(name, *args):
 
       # add 'em!
       BOM.setdefault(DigiKeyPN, [[Type, Value, Description, Package, Manufacturer, ManufacturerPN, Datasheets, Source_Link, DigiKeyPN], Prices])
-      #Description, DigiKeyPN, Manufacturer, ManufacturerPN, Datasheets, Prices, Value, Package, Source_Link])
 
-  print_output(BOM, invalids)
+  # print_output(BOM, invalids)
 
   export_BOM(BOM)
 
