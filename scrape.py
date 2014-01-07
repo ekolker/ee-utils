@@ -24,6 +24,22 @@ def print_output(BOM, invalids):
   print '\n\n'
 
 
+def price_check(BOM, invalids = []):
+  total = 0
+  for part_number in BOM.keys():
+    # part = BOM[part_number]
+    # data = part[0]
+    # pricing = part[1]
+    total = total + BOM[part_number][1][1]
+  output = "BOM cost is $" + str(total) + "\n\nThis number does not include quantiy, but uses unit pricing, so maybe it washes out."
+  if (len(invalids) > 0):
+    output = output + "\nThe following prat numbers were excluded:\n"
+    for item in invalids:
+      output = output + "\t" + item + "\n"
+  print output
+  return total
+
+
 def old_school_search(source, targets):
   start = source.find(targets[0])
   if start == -1:
@@ -107,6 +123,8 @@ def main(name, *args):
   # print_output(BOM, invalids)
 
   export_BOM(BOM)
+
+  price_check(BOM)
 
 
 if __name__ == '__main__':
