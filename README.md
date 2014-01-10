@@ -1,4 +1,4 @@
-diptrace-utils
+ee-utils
 ==============
 
 A series of scripts for EEs:
