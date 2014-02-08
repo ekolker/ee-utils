@@ -1,4 +1,4 @@
-import requests, sys, csv
+import requests, sys, csv, string
 from bs4 import BeautifulSoup
 from types import NoneType
 
@@ -8,7 +8,7 @@ def export_BOM(BOM, filename = 'BOM'):
   for part_number in BOM.keys():
     part = BOM[part_number][0]
     for attribute in part:
-      out.write(attribute + ', ')
+      out.write(string.replace(attribute, ',', ' ') + ', ')
     out.write("\n")
   out.close()
   print '\nBOM exported to:\t./' + filename + '.csv\n\n'
@@ -91,7 +91,7 @@ def main(name, *args):
       Datasheets = ""
       for link in soup.find_all(class_="lnkDatasheet"):
         # there could be more than one...
-        Datasheets = Datasheets + link.get('href').encode('ascii','ignore') + " "
+        Datasheets = Datasheets + link.get('href').encode('ascii', 'ignore') + " "
       Datasheets = Datasheets.strip()
 
       Prices = dict()
@@ -120,7 +120,7 @@ def main(name, *args):
       # add 'em!
       BOM.setdefault(DigiKeyPN, [[Type, Value, Description, Package, Manufacturer, ManufacturerPN, Datasheets, Source_Link, DigiKeyPN], Prices])
 
-  # print_output(BOM, invalids)
+  print_output(BOM, invalids)
 
   export_BOM(BOM)
 
