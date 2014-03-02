@@ -66,7 +66,7 @@ def main(name, *args):
 
     Source_Link = base_url + args[argument_number]
     r = requests.get(Source_Link)
-    page_source = r.text.encode("utf8")
+    page_source = r.text.encode("utf8") 
 
     # cut to the chase
     target = '<table class="product-details-table" '
